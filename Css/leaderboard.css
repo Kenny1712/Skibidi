@@ -6,6 +6,8 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
 }
 /* Dropdown hover hiện menu */
 .custom-dropdown:hover .genre-menu {
@@ -201,11 +203,12 @@ tr:nth-child(even) {
   font-weight: bold;
 }
 .fancy-footer {
-  background-color: #121212;
+  margin-top: 32px;
+  padding: 24px;
+  background: #0f1724;
   color: #fff;
-  padding: 60px 20px 30px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  position: relative;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
 }
 
 .footer-container {

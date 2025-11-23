@@ -17,77 +17,7 @@
     <link rel="stylesheet" href="../Css/search.css" />
     <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2"></script>
 
-    <style>
-      body {
-        font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-        margin: 16px;
-      }
-      header {
-        display: flex;
-        gap: 12px;
-        align-items: center;
-        margin-bottom: 12px;
-      }
-      input[type="search"] {
-        padding: 8px;
-        width: 320px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-        gap: 50px;
-      }
-      .card {
-        background-color: #1e1e2f;
-        color: #f1f1f1;
-        width: 200px;
-        padding: 15px;
-        border-radius: 12px;
-        text-align: center;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-        transition: transform 0.2s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-      }
-      .card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.08);
-      }
-      .thumb {
-        width: 100%;
-        height: 120px;
-        object-fit: cover;
-        border-radius: 6px;
-        background: #f4f4f4;
-      }
-      
-      .pagination {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        justify-content: center;
-        margin-top: 20px;
-        flex-wrap: wrap;
-      }
-      .fancy-footer {
-        margin-top: 32px;
-        padding: 24px;
-        background: #0f1724;
-        color: #fff;
-        border-radius: 12px;
-      }
-      .footer-container {
-        display: flex;
-        gap: 24px;
-        flex-wrap: wrap;
-      }
-      .footer-section img {
-        max-width: 60px;
-        display: block;
-        margin-bottom: 8px;
-      }
-    </style>
+    
   </head>
 
   <body>
@@ -126,51 +56,7 @@
             <li class="nav-item">
               <a class="nav-link" href="./new_game.html">Game mới</a>
             </li>
-            <li class="nav-item dropdown custom-dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                href="#"
-                id="genreDropdown"
-                role="button"
-                data-bs-toggle="dropdown"
-                >Thể loại</a
-              >
-              <ul
-                class="dropdown-menu genre-menu"
-                aria-labelledby="genreDropdown"
-              >
-                <li>
-                  <a class="dropdown-item" href="./Game_hanh_dong.html"
-                    >Hành động</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./Game_phieu_luu.html"
-                    >Phiêu lưu</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./Game_nhap_vai.html"
-                    >Nhập vai</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./Game_kinh_di.html"
-                    >Kinh dị</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./Game_the_thao.html"
-                    >Thể thao</a
-                  >
-                </li>
-                <li>
-                  <a class="dropdown-item" href="./Game_mo_phong.html"
-                    >Mô phỏng</a
-                  >
-                </li>
-              </ul>
-            </li>
+            
             <li class="nav-item">
               <a class="nav-link" href="./login.html" id="loginBtn"
                 >Đăng nhập</a
@@ -181,6 +67,16 @@
                 >Đăng ký</a
               >
             </li>
+            <select id="genreSelect" class="form-select genre-dropdown">
+    <option value="">Tất cả thể loại</option>
+    <option value="action">Hành động</option>
+    <option value="adventure">Phiêu lưu</option>
+    <option value="role-playing-games-rpg">Nhập vai</option>
+    <option value="horror">Kinh dị</option>
+    <option value="sports">Thể thao</option>
+    <option value="simulation">Mô phỏng</option>
+</select>
+
             <li
               class="nav-item dropdown user-dropdown"
               id="userDropdown"
@@ -254,7 +150,7 @@
     <h1>Tìm kiếm game</h1>
 
     <!-- Search + Filter -->
-    <div class="d-flex gap-2 align-items-center mb-3">
+    <div class="search-container">
       <input
         id="search"
         type="search"
@@ -274,18 +170,18 @@
         <option value="simulation">Mô phỏng</option>
       </select>
     </div>
-    <div style="margin-top: 12px">
+    <div class="skibidi">
       Số kết quả tìm được: <span id="count">0</span>
     </div>
     <main>
-      <div id="results" class="grid"></div>
+      <div id="results" class="game-list"></div>
 
       <div class="pagination">
-        <button id="firstPageBtn">« Đầu</button>
-        <button id="prevPageBtn">« Trước</button>
+        <button class="footer-button" id="firstPageBtn">« Đầu</button>
+        <button class="footer-button" id="prevPageBtn">« Trước</button>
         <span id="pageInfo">Trang 1</span>
-        <button id="nextPageBtn">Tiếp »</button>
-        <button id="lastPageBtn">Cuối »</button>
+        <button class="footer-button" id="nextPageBtn">Tiếp »</button>
+        <button class="footer-button" id="lastPageBtn">Cuối »</button>
 
         <input
           type="number"
@@ -293,14 +189,14 @@
           min="1"
           placeholder="Nhập trang..."
         />
-        <button id="goBtn">Đi</button>
+        <button class="footer-button" id="goBtn">Đi</button>
       </div>
     </main>
 
     <!-- SCRIPT: logic (sửa lỗi ID & kết hợp genre + search + pagination) -->
     <script>
       const API_KEY = "d63e85e85042401899d08350ad872094";
-      const PAGE_SIZE = 25;
+      const PAGE_SIZE = 24;
       let currentPage = 1;
       let totalPages = 1;
       let lastQuery = "";
@@ -362,13 +258,11 @@
         countEl.textContent = data.count ?? data.results.length;
         data.results.forEach((g) => {
           const card = document.createElement("article");
-          card.className = "card";
+          card.className = "game-card";
           card.innerHTML = `
-          <img class="thumb" src="${
-            g.background_image ?? ""
-          }" alt="${escapeHtml(g.name)}"
+          <img src="${g.background_image ?? ""}" alt="${escapeHtml(g.name)}"
             onerror="this.onerror=null;this.src='https://png.pngtree.com/png-clipart/20190920/original/pngtree-blue-gamepad-illustration-png-image_4635515.jpg'"/>
-          <h4 style="margin:8px 0 4px">${escapeHtml(g.name)}</h4>
+          <h2 style="margin:8px 0 4px">${escapeHtml(g.name)}</h2>
           <!-- <div class="meta">Rating: ${g.rating} · Released: ${
             g.released ?? "—"
           }</div> -->
@@ -460,6 +354,16 @@
             localStorage.getItem("currentEmail") || "dochibinh1981@gmail.com";
         }
       });
+
+
+
+      document.getElementById("genreSelect")?.addEventListener("change", function () {
+    const genre = this.value;
+    window.location.href = genre 
+        ? `genre.html?type=${genre}`
+        : `genre.html`;
+});
+
     </script>
 
     <button
