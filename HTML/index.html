@@ -418,22 +418,20 @@
     </script>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const scrollBtn = document.getElementById("scrollToTop");
-        if (scrollBtn) {
-          scrollBtn.addEventListener("click", function () {
-            const scrollStep = -window.scrollY / 50;
-            const scrollInterval = setInterval(function () {
-              if (window.scrollY !== 0) {
-                window.scrollBy(0, scrollStep);
-              } else {
-                clearInterval(scrollInterval);
-              }
-            }, 10);
-          });
-        }
+document.addEventListener("DOMContentLoaded", function () {
+  const scrollBtn = document.getElementById("scrollToTop");
+  if (scrollBtn) {
+    scrollBtn.addEventListener("click", function () {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
       });
-    </script>
+    });
+  }
+});
+</script>
+
+
     <script>
       window.addEventListener("load", function () {
         const savedAvatar = localStorage.getItem("userAvatar");

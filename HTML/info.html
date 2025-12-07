@@ -1,185 +1,608 @@
 <!DOCTYPE html>
 <html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chi tiết game</title>
-  <link rel="icon" href="./game-controller.png" type="image/png" />
-  <meta name="theme-color" content="#ff7f50" />
-  <style>
-    body {
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-      margin: 0;
-      padding: 0;
-      background: #f9f9f9;
-      color: #333;
-    }
-    header {
-      background: #ff7f50;
-      color: white;
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-    header h1 {
-      font-size: 20px;
-      margin: 0;
-    }
-    header button {
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: none;
-      background: white;
-      color: #ff7f50;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    header button:hover {
-      background: #ffe0d6;
-    }
-    main {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 0 16px;
-    }
-    #d-title {
-      font-size: 28px;
-      margin-bottom: 12px;
-      color: #ff7f50;
-    }
-    #d-img {
-      width: 100%;
-      max-width: 500px;
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      margin-bottom: 16px;
-    }
-    #d-desc {
-      font-size: 16px;
-      line-height: 1.6;
-      margin-bottom: 16px;
-    }
-    .meta {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 16px;
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    #translate-btn {
-      margin-bottom: 16px;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 6px;
-      background: #ff7f50;
-      color: white;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    #translate-btn:hover {
-      background: #ff946f;
-    }
-    @media (max-width: 600px) {
-      #d-title { font-size: 22px; }
-      #d-img { max-width: 100%; }
-    }
-  </style>
-</head>
-<body>
-  <header>
-    <h1>Chi tiết Game</h1>
-    <button onclick="history.back()">« Quay lại</button>
-  </header>
-  <main>
-    <div class="container">
-      <h2 id="d-title"></h2>
-      <img id="d-img" />
-      <button id="translate-btn">Dịch sang tiếng Việt</button>
-      <p id="d-desc">Đang chờ dữ liệu...</p>
-      <p class="meta">
-        Thể loại: <span id="d-genres"></span> · 
-        Phát hành: <span id="d-released"></span>
-      </p>
-    </div>
-  </main>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chi tiết game</title>
 
-  <script>
-    const API_KEY = "d63e85e85042401899d08350ad872094";
-    const params = new URLSearchParams(window.location.search);
-    const gameId = params.get("id");
-    let originalDesc = "";
-    let translatedDesc = "";
-    let isVietnamese = false;
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 
-    async function translateGoogle(text) {
-      try {
-        const res = await fetch(
-          "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=" +
-            encodeURIComponent(text)
-        );
-        const data = await res.json();
-        return data[0].map(item => item[0]).join("");
-      } catch (e) {
-        console.log("Lỗi dịch:", e);
-        return text;
-      }
-    }
+    <link rel="stylesheet" href="../Css/Game.css" />
+  </head>
 
-    if (!gameId) {
-      document.querySelector(".container").innerHTML =
-        "<p>Không có ID game!</p>";
-    } else {
-      fetch(`https://api.rawg.io/api/games/${gameId}?key=${API_KEY}`)
-        .then((res) => res.json())
-        .then((data) => {
-          document.getElementById("d-title").textContent = data.name;
-          document.getElementById("d-img").src =
-            data.background_image ??
-            "https://png.pngtree.com/png-clipart/20190920/original/pngtree-blue-gamepad-illustration-png-image_4635515.jpg";
-          originalDesc = data.description_raw || "Không có mô tả.";
-          document.getElementById("d-desc").textContent = originalDesc;
-          document.getElementById("d-genres").textContent =
-            (data.genres || []).map((g) => g.name).join(", ");
-          document.getElementById("d-released").textContent =
-            data.released ?? "—";
-        })
-        .catch((err) => {
-          console.error(err);
-          document.querySelector(".container").innerHTML =
-            "<p>Lỗi khi lấy dữ liệu game.</p>";
-        });
-    }
+  <body>
+    <nav class="navbar navbar-expand-lg custom-navbar">
+      <div class="container-fluid">
+        <!-- Logo -->
+        <a
+          class="navbar-brand d-flex align-items-center"
+          href="../HTML/index.html"
+        >
+          <img src="../Img/Game_logo.webp" alt="Logo" />
+          <span>Game downloader</span>
+        </a>
 
-    // Nút toggle dịch
-    document.getElementById("translate-btn").addEventListener("click", async () => {
-      const btn = document.getElementById("translate-btn");
+        <!-- Nút hamburger -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#mainNavbar"
+          aria-controls="mainNavbar"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
 
-      if (!isVietnamese) {
-        // Nếu chưa dịch thì dịch
-        if (!translatedDesc) {
-          btn.disabled = true;
-          btn.textContent = "Đang dịch...";
-          translatedDesc = await translateGoogle(originalDesc);
-          translatedDesc = translatedDesc.replace(/\n/g, "<br/>");
-          btn.disabled = false;
+        <!-- Menu -->
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="mainNavbar"
+        >
+          <ul class="navbar-nav mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="btn btn-search-nav ms-2" href="./search.html"
+                >🔍 Tìm kiếm game</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./new_game.html">Game mới</a>
+            </li>
+            <li class="nav-item dropdown custom-dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="genreDropdown"
+                role="button"
+              >
+                Thể loại
+              </a>
+              <ul
+                class="dropdown-menu genre-menu"
+                aria-labelledby="genreDropdown"
+              >
+                <li>
+                  <a class="dropdown-item" href="./Game_hanh_dong.html"
+                    >Hành động</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./Game_phieu_luu.html"
+                    >Phiêu lưu</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./Game_nhap_vai.html"
+                    >Nhập vai</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./Game_kinh_di.html"
+                    >Kinh dị</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./Game_the_thao.html"
+                    >Thể thao</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./Game_mo_phong.html"
+                    >Mô phỏng</a
+                  >
+                </li>
+              </ul>
+            </li>
+
+            <!-- Khi chưa đăng nhập -->
+            <li class="nav-item">
+              <a class="nav-link" href="./login.html" id="loginBtn"
+                >Đăng nhập</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="./register.html" id="registerBtn"
+                >Đăng ký</a
+              >
+            </li>
+
+            <!-- Khi đã đăng nhập -->
+            <li
+              class="nav-item dropdown user-dropdown"
+              id="userDropdown"
+              style="display: none"
+            >
+              <a
+                class="nav-link dropdown-toggle d-flex align-items-center"
+                href="#"
+                id="userDropdownBtn"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                <img
+                  id="userAvatar"
+                  src="../Img/user.jpg"
+                  alt="User"
+                  class="user-avatar"
+                />
+                <span id="userNameLabel" style="margin-left: 8px"></span>
+              </a>
+              <ul
+                class="dropdown-menu user-menu dropdown-menu-end"
+                aria-labelledby="userDropdownBtn"
+              >
+                <li>
+                  <span class="dropdown-item-text" id="userEmail"
+                    >dochibinh1981@gmail.com</span
+                  >
+                </li>
+                <li>
+                  <span class="dropdown-item-text">
+                    Số dư:
+                    <span id="dropdownBalance" style="color: red">0 đ</span>
+                  </span>
+                </li>
+
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="./profile.html">Tài khoản</a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./deposit_money.html"
+                    >Nạp tiền</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./leaderboard.html"
+                    >Top nạp tiền</a
+                  >
+                </li>
+                <li>
+                  <a class="dropdown-item" href="./purchased.html"
+                    >Game đã mua</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href="#" id="logoutBtnDropdown"
+                    >Đăng xuất</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main-section">
+      <div class="container">
+        <div class="khung">
+          <div class="game-hero">
+            <img id="d-img" alt="Game Image" />
+
+            <div class="hero-info">
+              <h1 id="d-title">Đang tải...</h1>
+
+              <div class="meta-grid">
+                <p><strong>Thể loại:</strong> <span id="d-genres"></span></p>
+                <p>
+                  <strong>Ngày phát hành:</strong> <span id="d-released"></span>
+                </p>
+                <p>
+                  <strong>Nhà phát hành:</strong>
+                  <span id="d-publishers"></span>
+                </p>
+                <p><strong>Cập nhật:</strong> <span id="d-updated"></span></p>
+                <p>
+                  <strong>Nhà phát triển:</strong>
+                  <span id="d-developers"></span>
+                </p>
+                <p><strong>Rating:</strong> <span id="d-rating"></span></p>
+              </div>
+              <p class="ro"><strong>Tags:</strong> <span id="d-tags"></span></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- MÔ TẢ -->
+        <div class="khung2" style="margin-top: 30px">
+          <h3 style="color: #03e0e0; margin-bottom: 15px">📜 Mô tả game</h3>
+
+          <p id="d-desc" style="white-space: pre-line">Đang tải mô tả...</p>
+          <button
+            id="translate-btn"
+            class="btn-download"
+            style="max-width: 260px"
+          >
+            Dịch sang tiếng Việt
+          </button>
+        </div>
+      </div>
+
+      <div class="khung2">
+        <p class="ng">Yêu cầu cấu hình:</p>
+        <p><span id="d-requirements"></span></p>
+      </div>
+
+      <section>
+        <div class="carousel-container">
+          <button class="nav prev" onclick="prevSlide()">‹</button>
+
+          <div class="carousel-track" id="carousel-track"></div>
+
+          <button class="nav next" onclick="nextSlide()">›</button>
+
+          <div class="carousel-dots" id="carousel-dots"></div>
+        </div>
+      </section>
+
+      <section class="feedback" id="danh-gia">
+      <h2>Đánh giá người chơi</h2>
+      <div class="feedback-list">
+        <div class="feedback-card">
+          <img src="../Img/user.jpg" alt="Người dùng" />
+          <div>
+            <strong>Hùng Trần</strong><br />
+            Đồ họa đỉnh thật sự, cảm giác như đang xem phim điện ảnh. Cơ chế
+            chiến đấu khó nhưng đã!
+          </div>
+        </div>
+      </div>
+
+      <!-- Form bình luận -->
+      <div class="comment-box">
+        <h2>Để lại bình luận</h2>
+        <form id="commentForm">
+          <input type="text" id="userName" placeholder="Tên của bạn" />
+          <textarea
+            id="userComment"
+            placeholder="Cảm nghĩ về game..."
+          ></textarea>
+          <button type="submit">Gửi</button>
+        </form>
+      </div>
+    </section>
+
+
+    
+    </main>
+
+    <script>
+      const API_KEY = "d63e85e85042401899d08350ad872094";
+      const gameId = new URLSearchParams(window.location.search).get("id");
+
+      let originalDesc = "";
+      let translatedDesc = "";
+      let isVietnamese = false;
+
+      // =========================
+      //     TẢI GAME + ẢNH
+      // =========================
+      async function loadGame() {
+        if (!gameId) return;
+
+        const url = `https://api.rawg.io/api/games/${gameId}?key=${API_KEY}`;
+        const data = await fetch(url).then((res) => res.json());
+
+        // -------- 1. ẢNH CHO CAROUSEL --------
+        const imgs = [];
+
+        if (data.background_image) imgs.push(data.background_image);
+        if (data.background_image_additional)
+          imgs.push(data.background_image_additional);
+
+        if (data.short_screenshots && data.short_screenshots.length > 0) {
+          data.short_screenshots.forEach((s) => {
+            if (s.image) imgs.push(s.image);
+          });
         }
-        document.getElementById("d-desc").innerHTML = translatedDesc;
-        btn.textContent = "Hiển thị tiếng gốc";
-        isVietnamese = true;
-      } else {
-        // Trở về gốc
-        document.getElementById("d-desc").innerHTML = originalDesc.replace(/\n/g, "<br/>");
-        btn.textContent = "Dịch sang tiếng Việt";
-        isVietnamese = false;
+
+        window.gameImages = imgs;
+        initCarousel();
+
+        // -------- 2. ẢNH HERO --------
+        document.getElementById("d-img").src =
+          data.background_image ||
+          "https://png.pngtree.com/png-clipart/20190920/original/pngtree-blue-gamepad-illustration-png-image_4635515.jpg";
+
+        // -------- 3. THÔNG TIN GAME --------
+        document.getElementById("d-title").textContent = data.name;
+        document.getElementById("d-genres").textContent =
+          (data.genres || []).map((g) => g.name).join(", ") || "Không có";
+        document.getElementById("d-released").textContent =
+          data.released ?? "Không rõ";
+        document.getElementById("d-updated").textContent =
+          data.updated?.slice(0, 10) ?? "Không rõ";
+        document.getElementById("d-publishers").textContent =
+          (data.publishers || []).map((p) => p.name).join(", ") || "Không có";
+        document.getElementById("d-developers").textContent =
+          (data.developers || []).map((d) => d.name).join(", ") || "Không có";
+
+        // -------- 4. MÔ TẢ --------
+        originalDesc = data.description_raw || "Không có mô tả.";
+        document.getElementById("d-desc").textContent = originalDesc;
+
+        // -------- 5. YÊU CẦU PC --------
+        const pc = (data.platforms || []).find(
+          (p) => p.platform?.name === "PC"
+        );
+        const reqMin = pc?.requirements?.minimum || "";
+const reqRec = pc?.requirements?.recommended || "";
+
+const minList = cleanRequirements(reqMin)
+  .map(item => `<li>${item}</li>`)
+  .join("");
+
+const recList = cleanRequirements(reqRec)
+  .map(item => `<li>${item}</li>`)
+  .join("");
+
+document.getElementById("d-requirements").innerHTML = `
+  <strong>Tối thiểu:</strong>
+  <ul>${minList}</ul>
+
+  <strong>Đề nghị:</strong>
+  <ul>${recList}</ul>
+`;
+
+
+        // -------- 6. TAGS --------
+        document.getElementById("d-tags").textContent =
+          (data.tags || []).map((t) => t.name).join(", ") || "Không có";
+
+        document.getElementById("d-rating").textContent =
+          data.rating ?? "Không có";
       }
-    });
-  </script>
-</body>
+function cleanRequirements(text) {
+  if (!text) return [];
+
+  // Xóa tag HTML
+  text = text.replace(/<\/?[^>]+>/g, "");
+
+  // Thay các từ khóa bằng xuống dòng (tự tách)
+  const keywords = [
+    "OS:", "Processor:", "Memory:", "Graphics:", "Storage:",
+    "Sound Card:", "Additional Notes:", "Network:", "DirectX:", "Other requirements:"
+  ];
+
+  keywords.forEach(key => {
+    text = text.replaceAll(key, "\n" + key);
+  });
+
+  // Tách từng dòng
+  return text
+    .split("\n")
+    .map(t => t.trim())
+    .filter(t => t.length > 0);
+}
+
+      // =========================
+      //   CAROUSEL CODE
+      // =========================
+      let current = 0;
+      let images = [];
+      let dots = [];
+
+      function initCarousel() {
+        const imagesArr = window.gameImages || [];
+        const track = document.getElementById("carousel-track");
+        const dotsContainer = document.getElementById("carousel-dots");
+
+        track.innerHTML = "";
+        dotsContainer.innerHTML = "";
+
+        if (imagesArr.length === 0) {
+          track.innerHTML = "<p style='color:white'>Không có ảnh.</p>";
+          return;
+        }
+
+        imagesArr.forEach((url, i) => {
+          const img = document.createElement("img");
+          img.src = url;
+          img.className = "carousel-img" + (i === 0 ? " active" : "");
+          track.appendChild(img);
+
+          const dot = document.createElement("span");
+          dot.className = "dot" + (i === 0 ? " active" : "");
+          dot.onclick = () => goToSlide(i);
+          dotsContainer.appendChild(dot);
+        });
+
+        images = document.querySelectorAll(".carousel-img");
+        dots = document.querySelectorAll(".dot");
+
+        updateCarousel();
+      }
+
+      function updateCarousel() {
+        images.forEach((img, i) =>
+          img.classList.toggle("active", i === current)
+        );
+        dots.forEach((dot, i) => dot.classList.toggle("active", i === current));
+      }
+
+      function nextSlide() {
+        if (images.length === 0) return;
+        current = (current + 1) % images.length;
+        updateCarousel();
+      }
+
+      function prevSlide() {
+        if (images.length === 0) return;
+        current = (current - 1 + images.length) % images.length;
+        updateCarousel();
+      }
+
+      function goToSlide(i) {
+        current = i;
+        updateCarousel();
+      }
+
+      setInterval(() => {
+        if (images.length > 0) nextSlide();
+      }, 3000);
+
+      loadGame();
+    </script>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("loginBtn");
+        const registerBtn = document.getElementById("registerBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const welcomeUser = document.getElementById("welcomeUser");
+
+        const isLoggedIn = localStorage.getItem("loggedIn");
+        const currentUser = localStorage.getItem("currentUser");
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const balance = localStorage.getItem("userBalance");
+        const balanceEl = document.getElementById("dropdownBalance");
+        if (balanceEl && balance !== null) {
+          balanceEl.textContent = Number(balance).toLocaleString() + " đ";
+        }
+      });
+    </script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const loginBtn = document.getElementById("loginBtn");
+        const registerBtn = document.getElementById("registerBtn");
+        const userDropdown = document.getElementById("userDropdown");
+        const userNameLabel = document.getElementById("userNameLabel");
+        const userEmailDisplay = document.getElementById("userEmail");
+        const logoutBtnDropdown = document.getElementById("logoutBtnDropdown");
+
+        const isLoggedIn = localStorage.getItem("loggedIn");
+        const currentUser = localStorage.getItem("currentUser");
+        const currentEmail = localStorage.getItem("currentEmail");
+
+        if (isLoggedIn === "true" && currentUser) {
+          if (loginBtn) loginBtn.style.display = "none";
+          if (registerBtn) registerBtn.style.display = "none";
+          if (userDropdown) userDropdown.style.display = "block";
+
+          userNameLabel.textContent = currentUser;
+          userEmailDisplay.textContent =
+            currentEmail || "dochibinh1981@gmail.com";
+
+          if (logoutBtnDropdown) {
+            logoutBtnDropdown.addEventListener("click", function () {
+              localStorage.removeItem("loggedIn");
+              localStorage.removeItem("currentUser");
+              localStorage.removeItem("currentEmail");
+              location.reload();
+            });
+          }
+        }
+      });
+    </script>
+    <script>
+      
+    </script>
+    <script>
+      window.addEventListener("load", function () {
+        const savedAvatar = localStorage.getItem("userAvatar");
+        const avatarImg = document.getElementById("userAvatar");
+
+        if (savedAvatar && avatarImg) {
+          avatarImg.src = savedAvatar;
+        }
+      });
+    </script>
+    <!-- SCRIPT -->
+    <script>
+      async function translateGoogle(text) {
+        try {
+          const res = await fetch(
+            "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=vi&dt=t&q=" +
+              encodeURIComponent(text)
+          );
+          const data = await res.json();
+          return data[0].map((t) => t[0]).join("");
+        } catch {
+          return text;
+        }
+      }
+
+      document.getElementById("translate-btn").onclick = async () => {
+        const btn = document.getElementById("translate-btn");
+
+        if (!isVietnamese) {
+          // dịch
+          if (!translatedDesc) {
+            btn.textContent = "Đang dịch...";
+            translatedDesc = await translateGoogle(originalDesc);
+          }
+
+          document.getElementById("d-desc").innerHTML = translatedDesc.replace(
+            /\n/g,
+            "<br/>"
+          );
+          btn.textContent = "Hiển thị tiếng gốc";
+          isVietnamese = true;
+        } else {
+          // tiếng gốc
+          document.getElementById("d-desc").innerHTML = originalDesc.replace(
+            /\n/g,
+            "<br/>"
+          );
+          btn.textContent = "Dịch sang tiếng Việt";
+          isVietnamese = false;
+        }
+      };
+    </script>
+  <button id="scrollToTop" title="Lên đầu trang">⬆</button>
+  </body>
+  <footer class="fancy-footer">
+  <div class="footer-container">
+    <div class="footer-section brand">
+      <img src="../Img/Game_logo.webp" alt="Logo" />
+      <h2>Game Downloader</h2>
+      <p>Tải game tốc độ cao – Cập nhật game hot mỗi ngày!</p>
+    </div>
+
+    <div class="footer-section links">
+      <h3>Danh mục</h3>
+      <ul>
+        <li><a href="./index.html">Trang chủ</a></li>
+          <li><a href="./new_game.html">Game mới</a></li>
+          <li><a href="./tintuc_1.html">Tin tức</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section support">
+      <h3>Hỗ trợ</h3>
+      <ul>
+        <li><a href="#">Chính sách bảo mật</a></li>
+        <li><a href="#">Điều khoản sử dụng</a></li>
+        <li><a href="#">Liên hệ</a></li>
+        <li><a href="#">FAQs</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section social">
+      <h3>Kết nối</h3>
+      <div class="social-icons">
+        <a href="#"><img src="../Img/Facebook.webp" alt="Facebook" /></a>
+        <a href="#"><img src="../Img/YouTube.png" alt="YouTube" /></a>
+        <a href="#"><img src="../Img/tiktok.jpg" alt="TikTok" /></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 Game Downloader. All rights reserved.</p>
+  </div>
+</footer>
+
 </html>

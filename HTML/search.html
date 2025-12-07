@@ -160,7 +160,7 @@
       />
       <button id="btnSearch" class="btn btn-primary">Tìm</button>
 
-      <select id="genreSelect" class="form-select" style="max-width: 220px">
+      <select id="genreSelect2" class="form-select" style="max-width: 220px">
         <option value="">Tất cả thể loại</option>
         <option value="action">Hành động</option>
         <option value="adventure">Phiêu lưu</option>
@@ -213,7 +213,7 @@
       const pageInfo = document.getElementById("pageInfo");
       const pageInput = document.getElementById("pageInput");
       const goBtn = document.getElementById("goBtn");
-      const genreSelect = document.getElementById("genreSelect");
+      const genreSelect2 = document.getElementById("genreSelect2");
 
       async function fetchGames({ page = 1, search = "", genre = "" } = {}) {
         const url = new URL("https://api.rawg.io/api/games");
@@ -317,8 +317,8 @@
         if (e.key === "Enter") btnSearch.click();
       });
 
-      genreSelect.addEventListener("change", () => {
-        selectedGenre = genreSelect.value;
+      genreSelect2.addEventListener("change", () => {
+        selectedGenre = genreSelect2.value;
         loadPage(1, lastQuery);
       });
 
